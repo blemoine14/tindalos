@@ -122,7 +122,7 @@ void AHeroCharacter::Tick(float DeltaSeconds)
 	{
 		const FRotator NewRotation = Movement.Rotation();
 		FHitResult Hit(1.f);
-		RootComponent->MoveComponent(Movement, NewRotation, true, &Hit);
+		RootComponent->MoveComponent(Movement, FRotator(0.0f,0.0f,0.0f), true, &Hit);
 
 		if (Hit.IsValidBlockingHit())
 		{
@@ -144,17 +144,22 @@ void AHeroCharacter::StopFireShot() {
 	bFiring = false;
 }
 
-void AHeroCharacter::FireShot()
-{
+void AHeroCharacter::FireShot(){
+
+	FHitResult TraceResult = GetHitResultUnderCursor();
+
+	FVector LineStart = GetActorLocation();
+	FVector LineStop = FVector(TraceResult.ImpactPoint.X, TraceResult.ImpactPoint.Y, LineStart.Z);
+
+	const FVector FireDirection = LineStop - LineStart;
+
+	const FRotator NewRotation = FireDirection.Rotation();
+	FHitResult Hit(1.f);
+	RootComponent->MoveComponent(FVector(0.0f, 0.0f, 0.0f), NewRotation, true, &Hit);
+
 	// If it's ok to fire again
 	if (bCanFire && bFiring){
 
-		FHitResult TraceResult = GetHitResultUnderCursor();
-
-		FVector LineStart = GetActorLocation();
-		FVector LineStop = FVector(TraceResult.ImpactPoint.X, TraceResult.ImpactPoint.Y, LineStart.Z);
-
-		const FVector FireDirection = LineStop - LineStart;
 		// If we are pressing fire stick in a direction
 		if (FireDirection.SizeSquared() > 0.0f)
 		{
