@@ -30,8 +30,9 @@ ATindalosPawn::ATindalosPawn()
 	MannequinMeshComponent->SetSkeletalMesh(MannequinMesh.Object);
 	
 	// Cache our sound effect
-	static ConstructorHelpers::FObjectFinder<USoundBase> FireAudio(TEXT("/Game/TwinStick/Audio/TwinStickFire.TwinStickFire"));
+	static ConstructorHelpers::FObjectFinder<USoundBase> FireAudio(TEXT("/Game/Mannequin/FPWeapon/Audio/M4A1_Single.M4A1_Single"));
 	FireSound = FireAudio.Object;
+
 
 	// Create a camera boom...
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -72,7 +73,7 @@ void ATindalosPawn::SetupPlayerInputComponent(class UInputComponent* PlayerInput
 	if (world) {
 		APlayerController* playerController = world->GetFirstPlayerController();
 		playerController->bShowMouseCursor = true;
-		UE_LOG(LogTemp, Warning, TEXT("tindalosPawn mouse enable"), this);
+		UE_LOG(LogTemp, Warning, TEXT("tindalosPawn mouse enable"));
 	}
 }
 

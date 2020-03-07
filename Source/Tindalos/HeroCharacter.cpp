@@ -14,7 +14,7 @@ AHeroCharacter::AHeroCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	//Fire sound
-	static ConstructorHelpers::FObjectFinder<USoundBase> FireAudio(TEXT("/Game/TwinStick/Audio/TwinStickFire.TwinStickFire"));
+	static ConstructorHelpers::FObjectFinder<USoundBase> FireAudio(TEXT("/Game/Mannequin/FPWeapon/Audio/M4A1_Single.M4A1_Single"));
 	FireSound = FireAudio.Object;
 	// Movement
 	MoveSpeed = 1000.0f;
@@ -55,9 +55,7 @@ FVector AHeroCharacter::CalculateCameraPosition() {
 
 
 	FVector ActorPosition = GetActorLocation();
-	UE_LOG(LogTemp, Warning, TEXT("tindalosPawn actor : %f %f %f"), ActorPosition.X, ActorPosition.Y, ActorPosition.Z);
 	FVector ProjectedHit = FVector(HitPosition.X, HitPosition.Y, ActorPosition.Z);
-	UE_LOG(LogTemp, Warning, TEXT("tindalosPawn Hit : %f %f %f"), ProjectedHit.X, ProjectedHit.Y, ProjectedHit.Z);
 
 	return (ProjectedHit - ActorPosition) / CameraMaxOffSet;
 }
@@ -75,7 +73,6 @@ FHitResult AHeroCharacter::GetHitResultUnderCursor() {
 
 			PlayerController->GetViewportSize(height,width);
 			PlayerController->GetMousePosition(mouse.X,mouse.Y);
-			UE_LOG(LogTemp, Warning, TEXT("tindalosPawn mouse on screen : %f %f %f %f"), height, width, (height-mouse.X)/2.0f, (width-mouse.Y)/2.0f);
 			
 			PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_WorldDynamic, false, TraceResult);
 			return TraceResult;
