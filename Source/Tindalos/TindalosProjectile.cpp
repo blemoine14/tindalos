@@ -40,6 +40,12 @@ void ATindalosProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor
 	{
 		OtherComp->AddImpulseAtLocation(GetVelocity() * 20.0f, GetActorLocation());
 	}
+	else {
+		if ((OtherActor != NULL) && (OtherActor != this) && (OtherActor->ActorHasTag("Enemy"))) {
+			OtherActor->Destroy();
+		}
+	}
+	
 
 	Destroy();
 }

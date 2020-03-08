@@ -24,7 +24,7 @@ class TINDALOS_API AHeroCharacter : public ACharacter
 public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Hero Character")
-		float Health;
+		int Health;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Hero Character")
 		bool isDead;
@@ -50,7 +50,7 @@ public:
 		class USoundBase* FireSound;
 
 	UFUNCTION(BlueprintCallable, Category = "Hero Character")
-		virtual void CalculateHealth(float delta);
+		virtual void CalculateHealth(int delta);
 
 	UFUNCTION(BlueprintCallable, Category = "Hero Character")
 		virtual void CalculateDead();

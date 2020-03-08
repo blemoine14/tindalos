@@ -19,8 +19,9 @@ AHeroCharacter::AHeroCharacter()
 	// Movement
 	MoveSpeed = 500.0f;
 	// Weapon
+	Health = 10;
 	GunOffset = FVector(120.f, 15.f, 50.f);
-	FireRate = 0.1f;
+	FireRate = 0.2f;
 	CameraMaxOffSet = 4.0f;
 	bCanFire = true;
 	bFiring = false;
@@ -34,7 +35,7 @@ void AHeroCharacter::BeginPlay()
 }
 
 
-void AHeroCharacter::CalculateHealth(float Delta)
+void AHeroCharacter::CalculateHealth(int Delta)
 {
 	Health += Delta;
 	CalculateDead();
@@ -96,7 +97,6 @@ void AHeroCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 	APlayerController* playerController = world->GetFirstPlayerController();
 	if (playerController) {
 		playerController->bShowMouseCursor = true;
-		UE_LOG(LogTemp, Warning, TEXT("tindalosPawn mouse enable"));
 	}
 }
 
@@ -104,41 +104,44 @@ void AHeroCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	// Find movement direction
-	const float ForwardValue = GetInputAxisValue(MoveForwardBinding);
-	const float RightValue = GetInputAxisValue(MoveRightBinding);
+	if (!isDead) {
 
-	// Clamp max size so that (X=1, Y=1) doesn't cause faster movement in diagonal directions
-	const FVector MoveDirection = FVector(ForwardValue, RightValue, 0.f).GetClampedToMaxSize(1.0f);
+		// Find movement direction
+		const float ForwardValue = GetInputAxisValue(MoveForwardBinding);
+		const float RightValue = GetInputAxisValue(MoveRightBinding);
 
-	// Calculate  movement
-	const FVector Movement = MoveDirection * MoveSpeed * DeltaSeconds;
+		// Clamp max size so that (X=1, Y=1) doesn't cause faster movement in diagonal directions
+		const FVector MoveDirection = FVector(ForwardValue, RightValue, 0.f).GetClampedToMaxSize(1.0f);
 
-	FHitResult TraceResult = GetHitResultUnderCursor();
+		// Calculate  movement
+		const FVector Movement = MoveDirection * MoveSpeed * DeltaSeconds;
 
-	FVector LineStart = GetActorLocation();
-	FVector LineStop = FVector(TraceResult.ImpactPoint.X, TraceResult.ImpactPoint.Y, LineStart.Z);
+		FHitResult TraceResult = GetHitResultUnderCursor();
 
-	const FVector FireDirection = (LineStop - LineStart).GetClampedToMaxSize(1.0f);
+		FVector LineStart = GetActorLocation();
+		FVector LineStop = FVector(TraceResult.ImpactPoint.X, TraceResult.ImpactPoint.Y, LineStart.Z);
+
+		const FVector FireDirection = (LineStop - LineStart).GetClampedToMaxSize(1.0f);
 
 
-	// If non-zero size, move this actor
-	if (Movement.SizeSquared() > 0.0f)
-	{
-		FHitResult Hit(1.f);
-		RootComponent->MoveComponent(Movement, FRotator(0.0f, 0.0f, 0.0f), true, &Hit);
-
-		if (Hit.IsValidBlockingHit())
+		// If non-zero size, move this actor
+		if (Movement.SizeSquared() > 0.0f)
 		{
-			const FRotator NewRotation = Movement.Rotation();
-			const FVector Normal2D = Hit.Normal.GetSafeNormal2D();
-			const FVector Deflection = FVector::VectorPlaneProject(Movement, Normal2D) * (1.f - Hit.Time);
-			RootComponent->MoveComponent(Deflection, NewRotation, true);
-		}
-	}
-	Aim(MoveDirection,FireDirection);
-	FireShot(FireDirection);
+			FHitResult Hit(1.f);
+			RootComponent->MoveComponent(Movement, FRotator(0.0f, 0.0f, 0.0f), true, &Hit);
 
+			if (Hit.IsValidBlockingHit())
+			{
+				const FRotator NewRotation = Movement.Rotation();
+				const FVector Normal2D = Hit.Normal.GetSafeNormal2D();
+				const FVector Deflection = FVector::VectorPlaneProject(Movement, Normal2D) * (1.f - Hit.Time);
+				RootComponent->MoveComponent(Deflection, NewRotation, true);
+			}
+		}
+		Aim(MoveDirection, FireDirection);
+		FireShot(FireDirection);
+		CalculateDead();
+	}
 }
 
 

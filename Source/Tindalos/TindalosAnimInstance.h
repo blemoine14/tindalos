@@ -22,7 +22,4 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HeroCharacter")
 		float Slide;
-
-	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
-
 };
