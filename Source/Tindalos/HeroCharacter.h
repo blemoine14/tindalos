@@ -49,7 +49,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Audio)
 		class USoundBase* FireSound;
 
-	/** Sound to play each time we got hit */
+	/** Sound to play each time we fire */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Audio)
 		class USoundBase* HitSound;
 
