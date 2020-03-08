@@ -1,7 +1,6 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #include "TindalosGameMode.h"
-#include "TindalosPawn.h"
 #include "UObject/ConstructorHelpers.h"
 
 ATindalosGameMode::ATindalosGameMode()
