@@ -7,4 +7,5 @@ UTindalosAnimInstance::UTindalosAnimInstance()
 {
 	Forward = 0.0f;
 	Slide = 0.0f;
+	isDead = false;
 }

@@ -16,12 +16,17 @@ AHeroCharacter::AHeroCharacter()
 	//Fire sound
 	static ConstructorHelpers::FObjectFinder<USoundBase> FireAudio(TEXT("/Game/Mannequin/FPWeapon/Audio/M4A1_Single.M4A1_Single"));
 	FireSound = FireAudio.Object;
+
+	//Hit sound
+	static ConstructorHelpers::FObjectFinder<USoundBase> HitAudio(TEXT("/Game/Mannequin/Audio/classic_hurt.classic_hurt"));
+	HitSound = HitAudio.Object;
+
 	// Movement
 	MoveSpeed = 500.0f;
 	// Weapon
 	Health = 10;
 	GunOffset = FVector(120.f, 15.f, 50.f);
-	FireRate = 0.2f;
+	FireRate = 0.12f;
 	CameraMaxOffSet = 4.0f;
 	bCanFire = true;
 	bFiring = false;
@@ -37,14 +42,21 @@ void AHeroCharacter::BeginPlay()
 
 void AHeroCharacter::CalculateHealth(int Delta)
 {
+	if (HitSound && !isDead)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, HitSound, GetActorLocation());
+	}
 	Health += Delta;
 	CalculateDead();
 }
 
 void AHeroCharacter::CalculateDead()
 {
-	if (Health <= 0)
+	if (Health <= 0) {
 		isDead = true;
+		UTindalosAnimInstance* animInstance = static_cast<UTindalosAnimInstance*>(GetMesh()->GetAnimInstance());
+		animInstance->isDead = true;
+	}
 	else
 		isDead = false;
 
@@ -188,7 +200,7 @@ void AHeroCharacter::FireShot(const FVector FireDirection){
 			// Spawn projectile at an offset from this pawn
 			const FVector SpawnLocation = GetActorLocation() + FireRotation.RotateVector(GunOffset);
 
-				
+			
 			UWorld* const World = GetWorld();
 			if (World) {
 				// spawn the projectile

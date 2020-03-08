@@ -49,6 +49,10 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Audio)
 		class USoundBase* FireSound;
 
+	/** Sound to play each time we got hit */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Audio)
+		class USoundBase* HitSound;
+
 	UFUNCTION(BlueprintCallable, Category = "Hero Character")
 		virtual void CalculateHealth(int delta);
 
