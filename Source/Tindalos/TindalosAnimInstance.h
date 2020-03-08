@@ -18,7 +18,7 @@ public:
 	UTindalosAnimInstance();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HeroCharacter")
-		float Speed;
+		float Forward;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HeroCharacter")
 		float Slide;

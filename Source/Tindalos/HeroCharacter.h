@@ -11,6 +11,8 @@
 #include "tindalosProjectile.h"
 #include "Kismet/GameplayStatics.h"
 #include "UObject/ConstructorHelpers.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "TindalosAnimInstance.h"
 #include "HeroCharacter.generated.h"
 
 UCLASS(Blueprintable)
@@ -61,9 +63,11 @@ public:
 	//Utils
 	FHitResult GetHitResultUnderCursor();
 
+	/* Move character and update animation */
+	void Aim(const FVector Movement, const FVector FireDirection);
 
 	/* Fire a shot in the specified direction */
-	void FireShot();
+	void FireShot(const FVector FireDirection);
 	void StartFireShot();
 	void StopFireShot();
 

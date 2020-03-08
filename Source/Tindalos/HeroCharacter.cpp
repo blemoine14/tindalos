@@ -17,9 +17,9 @@ AHeroCharacter::AHeroCharacter()
 	static ConstructorHelpers::FObjectFinder<USoundBase> FireAudio(TEXT("/Game/Mannequin/FPWeapon/Audio/M4A1_Single.M4A1_Single"));
 	FireSound = FireAudio.Object;
 	// Movement
-	MoveSpeed = 1000.0f;
+	MoveSpeed = 500.0f;
 	// Weapon
-	GunOffset = FVector(90.f, 0.f, 0.f);
+	GunOffset = FVector(120.f, 15.f, 50.f);
 	FireRate = 0.1f;
 	CameraMaxOffSet = 4.0f;
 	bCanFire = true;
@@ -114,24 +114,52 @@ void AHeroCharacter::Tick(float DeltaSeconds)
 	// Calculate  movement
 	const FVector Movement = MoveDirection * MoveSpeed * DeltaSeconds;
 
+	FHitResult TraceResult = GetHitResultUnderCursor();
+
+	FVector LineStart = GetActorLocation();
+	FVector LineStop = FVector(TraceResult.ImpactPoint.X, TraceResult.ImpactPoint.Y, LineStart.Z);
+
+	const FVector FireDirection = (LineStop - LineStart).GetClampedToMaxSize(1.0f);
+
+
 	// If non-zero size, move this actor
 	if (Movement.SizeSquared() > 0.0f)
 	{
-		const FRotator NewRotation = Movement.Rotation();
 		FHitResult Hit(1.f);
-		RootComponent->MoveComponent(Movement, FRotator(0.0f,0.0f,0.0f), true, &Hit);
+		RootComponent->MoveComponent(Movement, FRotator(0.0f, 0.0f, 0.0f), true, &Hit);
 
 		if (Hit.IsValidBlockingHit())
 		{
+			const FRotator NewRotation = Movement.Rotation();
 			const FVector Normal2D = Hit.Normal.GetSafeNormal2D();
 			const FVector Deflection = FVector::VectorPlaneProject(Movement, Normal2D) * (1.f - Hit.Time);
 			RootComponent->MoveComponent(Deflection, NewRotation, true);
 		}
 	}
-
-	FireShot();
+	Aim(MoveDirection,FireDirection);
+	FireShot(FireDirection);
 
 }
+
+
+void AHeroCharacter::Aim(const FVector MoveDirection, const FVector FireDirection) {
+	UTindalosAnimInstance* animInstance = static_cast<UTindalosAnimInstance*>(GetMesh()->GetAnimInstance());
+	FVector diffDirection = FireDirection - MoveDirection;
+	double angle = FMath::Acos(FVector::DotProduct(FireDirection, MoveDirection));
+	FVector cross = FVector::CrossProduct(FireDirection, MoveDirection);
+	if (FVector::DotProduct(FVector(0.0f,0.0f,1.0f), cross) < 0) { // Or > 0
+		angle = -angle;
+	}
+	if (MoveDirection.SizeSquared() > 0.0f) {
+		animInstance->Forward = FMath::Cos(angle);
+		animInstance->Slide = FMath::Sin(angle);
+	}
+	else {
+		animInstance->Forward = 0.0f;
+		animInstance->Slide = 0.0f;
+	}
+}
+
 
 void AHeroCharacter::StartFireShot() {
 	bFiring = true;
@@ -141,14 +169,7 @@ void AHeroCharacter::StopFireShot() {
 	bFiring = false;
 }
 
-void AHeroCharacter::FireShot(){
-
-	FHitResult TraceResult = GetHitResultUnderCursor();
-
-	FVector LineStart = GetActorLocation();
-	FVector LineStop = FVector(TraceResult.ImpactPoint.X, TraceResult.ImpactPoint.Y, LineStart.Z);
-
-	const FVector FireDirection = LineStop - LineStart;
+void AHeroCharacter::FireShot(const FVector FireDirection){
 
 	const FRotator NewRotation = FireDirection.Rotation();
 	FHitResult Hit(1.f);
